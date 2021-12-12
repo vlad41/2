@@ -1,0 +1,116 @@
+{% load bootstrap4 %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{% block title %}military helper - main page{% endblock %}</title>
+    {% bootstrap_css %}
+    <link rel="stylesheet" type="text/css"
+          href="{% static 'style.css' %}">
+    {% bootstrap_javascript jquery='slim' %}
+</head>
+<body>
+
+<header>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <center><b>Онлайн черга до Військомату</b></center>
+
+    {% if user.is_authenticated %}
+
+    <h3>Привіт {{ username }}, показана черга для {{ area }} в {{ day }} </h3>
+    <ul>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle"
+               data-toggle="dropdown"
+               href="#" role="button" aria-haspopup="true"
+               aria-expanded="false">Профіль</a>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="{% url 'main:logout' %}">Log out</a>
+            </div>
+        </li>
+
+
+
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle"
+               data-toggle="dropdown"
+               href="#" role="button" aria-haspopup="true"
+               aria-expanded="false">Обрати час</a>
+            <div class="dropdown-menu">
+                <form method="post" action="{% url 'main:profile' %}">
+                    {% csrf_token %}
+                    <select name="add_time">
+                        {% for add_time in times %}
+                            <option value="{{add_time}}">{{add_time}}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="submit" value="Обрати">
+                </form>
+            </div>
+        </li>
+
+
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle"
+               data-toggle="dropdown"
+               href="#" role="button" aria-haspopup="true"
+               aria-expanded="false">Скасувати час</a>
+            <div class="dropdown-menu">
+                <form method="post" action="{% url 'main:profile' %}">
+                    {% csrf_token %}
+                    <select name="remove_time">
+                        {% for remove_time in times %}
+                        <option value="{{remove_time}}">{{remove_time}}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="submit" value="Обрати">
+                </form>
+            </div>
+        </li>
+    </ul>
+
+
+    {% else %}
+    <li class="nav-item"><a class="nav-link"
+                            href="{% url 'main:login' %}">Sing in</a></li>
+    <li class="nav-item"><a class="nav-link"
+                            href="{% url 'main:register' %}">Get started</a></li>
+    {% endif %}
+</header>
+<section>
+     <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle"
+               data-toggle="dropdown"
+               href="#" role="button" aria-haspopup="true"
+               aria-expanded="false">Фільтр</a>
+            <div class="dropdown-menu">
+                <form method="post" action="{% url 'main:profile' %}">
+                    {% csrf_token %}
+                    <select name="area" id="area">
+                        <option value="dar">Дарниця</option>
+                        <option value="dec">Десна</option>
+                        <option value="dni">Дніпро</option>
+                    </select>
+
+                    <select name="day" id="day">
+                        <option value="tu" selected="selected">Вівторок</option>
+                        <option value="th">Четвер</option>
+                    </select>
+
+                    <input type="submit" value="Показати">
+                </form>
+            </div>
+        </li>
+    {% block content %}
+
+    {% endblock%}
+</section>
+
+
+<footer>
+    <code>Створино за участі Міністрерства Оборони України</code>
+</footer>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{{ user.username }}!
+You registered in "military Helper"
+To activate your account, follow the link below.
+{{ host }}{% url 'main:register_activate' sign=sign %}"
+Activate account
+Sincerely, site administration "military Helper"

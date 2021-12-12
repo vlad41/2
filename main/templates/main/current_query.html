@@ -1,0 +1,26 @@
+{% extends "layout/basic.html" %}
+{% load bootstrap4 %}
+{% block title %}Login{% endblock %}
+
+
+{% block content %}
+<h2>Стан черги</h2>
+<table class="table table-dark">
+    <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Стан черги</th>
+      <th scope="col">Призовник</th>
+    </tr>
+  </thead>
+{% for item in queryList %}
+    <tbody>
+    <tr>
+      <th scope="row">{{item.time}}</th>
+      <td>{{item.isBusy}}</td>
+      <td>{{item.user}}</td>
+    </tr>
+    </tbody>
+{% endfor %}
+</table>
+{% endblock %}

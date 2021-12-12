@@ -1,0 +1,11 @@
+{% extends "layout/basic.html" %}
+{% block title %} Api token {% endblock %}
+{% block content %}
+    {% if user.api_token %}
+        <h3>{{ user.username }},this is your personal api token</h3>
+        <p><b><i>{{ user.api_token }}</i></b></p>
+    {% else %}
+        <h3>You don't have api token</h3>
+    {% endif %}
+
+{% endblock %}
