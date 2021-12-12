@@ -1,0 +1,24 @@
+
+.root {
+    font-size: larger;
+}
+
+img.main-image {
+    width: 300px;
+}
+* {
+    text-align: center;
+}
+
+li {
+    list-style: none;
+
+}
+
+ul {
+    display: flex;
+    flex-direction: row;
+}
+body {
+    padding: 0 20% 0 20%;
+}
