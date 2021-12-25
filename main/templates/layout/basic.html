@@ -15,11 +15,18 @@
 
 <header>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <center><b>Онлайн черга до Військомату</b></center>
+
 
     {% if user.is_authenticated %}
 
-    <h3>Привіт {{ username }}, показана черга для {{ area }} в {{ day }} </h3>
+    <h3>Привіт, {{ current_user_fio.0 }}! <br>Показана черга
+        {% if area == "dar" %}Дарницького військомату{% endif %}
+        {% if area == "dec" %}Деснянського військомату{% endif %}
+        {% if area == "dni" %}Дніпровського військомату{% endif %}
+        на
+        {% if day == "tu" %}вівторок{% endif %}
+        {% if day == "th" %}четвер{% endif %}
+    </h3>
     <ul>
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle"
@@ -27,10 +34,9 @@
                href="#" role="button" aria-haspopup="true"
                aria-expanded="false">Профіль</a>
             <div class="dropdown-menu">
-                <a class="dropdown-item" href="{% url 'main:logout' %}">Log out</a>
+                <a class="dropdown-item" href="{% url 'main:logout' %}">Вийти</a>
             </div>
         </li>
-
 
 
         <li class="nav-item dropdown">
@@ -70,39 +76,27 @@
             </div>
         </li>
     </ul>
+{% else %}
+    <h3>Привіт, Гість! <br>
+        {% if area == "dar" %}Показана черга Дарницького військомату на{% endif %}
+        {% if area == "dec" %}Показана черга Деснянського військомату на{% endif %}
+        {% if area == "dni" %}Показана черга Дніпровського військомату на{% endif %}
 
+        {% if day == "tu" %}вівторок{% endif %}
+        {% if day == "th" %}четвер{% endif %}
+    </h3>
 
-    {% else %}
     <li class="nav-item"><a class="nav-link"
-                            href="{% url 'main:login' %}">Sing in</a></li>
+                            href="{% url 'main:mainpage' %}">На головну сторінку</a></li>
     <li class="nav-item"><a class="nav-link"
-                            href="{% url 'main:register' %}">Get started</a></li>
+                            href="{% url 'main:register' %}">Реєстрація</a></li>
+    <li class="nav-item"><a class="nav-link"
+                            href="{% url 'main:login' %}">Увійти</a></li>
+
     {% endif %}
 </header>
 <section>
-     <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle"
-               data-toggle="dropdown"
-               href="#" role="button" aria-haspopup="true"
-               aria-expanded="false">Фільтр</a>
-            <div class="dropdown-menu">
-                <form method="post" action="{% url 'main:profile' %}">
-                    {% csrf_token %}
-                    <select name="area" id="area">
-                        <option value="dar">Дарниця</option>
-                        <option value="dec">Десна</option>
-                        <option value="dni">Дніпро</option>
-                    </select>
 
-                    <select name="day" id="day">
-                        <option value="tu" selected="selected">Вівторок</option>
-                        <option value="th">Четвер</option>
-                    </select>
-
-                    <input type="submit" value="Показати">
-                </form>
-            </div>
-        </li>
     {% block content %}
 
     {% endblock%}
@@ -110,7 +104,7 @@
 
 
 <footer>
-    <code>Створино за участі Міністрерства Оборони України</code>
+    <code>Створено за участі Міністерства Оборони України</code>
 </footer>
 </body>
 </html>

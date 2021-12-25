@@ -9,15 +9,16 @@ urlpatterns = [
     path('login/', views.UserLoginView.as_view(), name='login'),
     path('logout/', views.UserLogoutView.as_view(), name='logout'),
     # Registration
-    path('accounts/register/', views.RegisterUserView.as_view(), name='register'),
+    path('register/', views.RegisterUserView.as_view(), name='register'),
 
     path('accounts/profile/', views.profile_posts, name='profile'),
+
+    path('current_query/', views.profile_posts, name='current_query'),
 
     # Api token
     path('accounts/profile/personal_token/', views.api_token, name='profile_api_token'),
 
-    path('', views.profile_posts, name='main'),
-
+    path('', views.mainpage, name='mainpage'),
 
 ]
 

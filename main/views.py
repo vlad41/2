@@ -26,10 +26,13 @@ from . import forms
 from .models import PostUser
 from .forms import RegisterForm
 
+from django.contrib import messages
+
 
 # Create your views here.
-def index(request):
-    return render(request, 'main/mainpage.html')
+def mainpage(request):
+    messages.add_message(request, messages.SUCCESS, 'СООБЩЕние')
+    return render(request, 'main/mainpage.html', {'current_path': request.path})
 
 
 def current_query(request):
@@ -115,7 +118,6 @@ class UserLogoutView(LoginRequiredMixin, LogoutView):
     template_name = login = 'login/logout.html'
 
 
-# p
 def profile_posts(request):
 
     # todo Save local area and day
@@ -135,10 +137,6 @@ def profile_posts(request):
     f = open("temp.txt", "w")
     f.write(area[0] + " " + day[0])
 
-
-
-
-
     add_time = request.POST.getlist("add_time")
     remove_time = request.POST.getlist("remove_time")
 
@@ -147,8 +145,8 @@ def profile_posts(request):
     people_id = None
 
     if request.user.is_authenticated:
-        username = request.user.username
-        people_id = request.user.id
+        username = request.user.username # username текущего пользователя
+        people_id = request.user.id # id текущего пользователя (для получения его email)
 
     alltime = ['09:00', '09:15', '09:30', '09:45',
                '10:00', '10:15', '10:30', '10:45',
@@ -156,11 +154,22 @@ def profile_posts(request):
                '12:00', '12:15', '12:30', '12:45',
                '13:00']
 
+    if str(request.user) == "AnonymousUser":
+        current_user_fio = []
+    else:
+        current_user_fio = [request.user.name, request.user.surname, request.user.fname]
+
+    # Возвращает данные из таблицы для всех очередей
+    def get_all_queues():
+        return list(QueueConscripts.objects.all())
+
+    # Возвращает текущие данные из таблицы для выбранной очереди
     def get_filtered_queue():
         return list(QueueConscripts.objects.filter(week_day=day[0], department=area[0]).all())
 
+    # Возвращает конвертированный список для текущей очереди, который мы уже можем использовать
     def get_converted_list(raw_queue):
-        busy_times = [rq.time for rq in raw_queue]
+        busy_times = [rq.time for rq in raw_queue] # Из текущей очереди отбираем занятое время
 
         queueList = []
         for time in alltime:
@@ -178,34 +187,50 @@ def profile_posts(request):
 
         return queueList
 
-    raw_queue = get_filtered_queue();
-    busy_times = get_converted_list(raw_queue)
-    print(raw_queue)
+    raw_queue = get_all_queues() # Текущие данные из таблицы для всех очередей
+    busy_times = get_converted_list(raw_queue) # Конвертированный список для всех очередей, который мы уже можем использовать
+    print("Текущие данные из таблицы для всех очередей: ", raw_queue, "\n")
 
-    people_in_queue_times = 0
+    people_in_queue_times = 0 # Сколько пользователей с текущим именем уже записаны в очередь
     for i in raw_queue:
         if i.people_id == people_id:
-            people_in_queue_times +=1
+            people_in_queue_times += 1
 
     if add_time != []:
-        for time in busy_times:
-            if add_time[0] == time["time"] and time["isBusy"] == 'Вільно' and people_in_queue_times <= 1 :
+        if people_in_queue_times > 0:
+            print('Ви вже записані у чергу! Ваша черга: ', add_time[0])
+        else:
+            print(add_time)
+            for time in busy_times:
+                if add_time[0] == time["time"] and time["isBusy"] == 'Зайнято':
+                    print('Це місце вже зайнято! Оберіть інше.')
 
-                QueueConscripts.objects.create(week_day=day[0], department=area[0], time=add_time[0], people=PostUser.objects.filter(id=people_id).first(), busy="Зайнято")
+                if add_time[0] == time["time"] and time["isBusy"] == 'Вільно' and people_in_queue_times < 1:
+                    QueueConscripts.objects.create(week_day=day[0], department=area[0], time=add_time[0], people=PostUser.objects.filter(id=people_id).first(), busy="Зайнято")
 
 
     if remove_time != []:
         postUser = PostUser.objects.filter(id=people_id).first()
+        print('postUser: ', postUser)
         for time in busy_times:
             if remove_time[0] == time["time"] and time["isBusy"] == 'Зайнято' and time["user"] == postUser:
-                temp = QueueConscripts.objects.filter(week_day=day[0], department=area[0], time=remove_time[0],
-                                               people=postUser).first()
+                temp = QueueConscripts.objects.filter(week_day=day[0], department=area[0], time=remove_time[0], people=postUser).first()
 
                 if temp != None:
                     QueueConscripts.objects.filter(pk=temp.id).delete()
 
     table = get_converted_list(get_filtered_queue())
-    context = {'queryList': table, 'day': day, 'area': area, 'times': alltime, 'surname': username}
+
+    current_user_queue = list(QueueConscripts.objects.filter(people=people_id).all())
+    if not current_user_queue:  # Если пользователь не записан в очередь - True
+        print("current_user_queue:", current_user_queue)  # Пользователь не в очереди
+        current_user_queue = ''
+    else:
+        print("current_user_queue:", current_user_queue[0])  # Текущая очередь пользователя
+        current_user_queue = str(current_user_queue[0]).split(' ')
+
+    context = {'queryList': table, 'day': day[0], 'area': area[0], 'times': alltime,
+               'username': username, 'current_user_queue': current_user_queue, 'current_user_fio': current_user_fio}
     return render(request, 'main/current_query.html', context)
 
 

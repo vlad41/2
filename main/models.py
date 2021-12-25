@@ -8,6 +8,12 @@ from .utilities import get_timestamp_path
 
 
 class PostUser(AbstractUser):
+    username = models.CharField(max_length=20, unique=False, null=True)
+
+    name = models.CharField(max_length=20, null=True)
+    surname = models.CharField(max_length=20, null=True)
+    fname = models.CharField(max_length=20, null=True)
+
     phoneNumber = PositiveIntegerField(unique=True, null=True, blank=False)
     email = models.EmailField('email', unique=True)
     age = models.PositiveIntegerField(null=True)

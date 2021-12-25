@@ -1,14 +1,60 @@
 {% extends "layout/basic.html" %}
 {% load bootstrap4 %}
-{% block title %}Login{% endblock %}
+{% block title %}Онлайн черга{% endblock %}
+
 
 
 {% block content %}
+<b>
+
+{% if current_user_queue == "" %}
+    <font color="red">
+    Ви ще не записані у чергу. Для того щоб записатись оберіть чергу та час.
+    </font>
+{% else %}
+    <font color="green">
+    Ви вже записані у чергу
+    {% if current_user_queue.0 == "dar" %}Дарницького військомату{% endif %}
+    {% if current_user_queue.0 == "dec" %}Деснянського військомату{% endif %}
+    {% if current_user_queue.0 == "dni" %}Дніпровського військомату{% endif %}
+    у
+    {% if current_user_queue.1 == "tu" %}вівторок{% endif %}
+    {% if current_user_queue.1 == "th" %}четвер{% endif %}
+    на
+    {{ current_user_queue.2 }}
+    </font>
+{% endif %}
+</b>
+
+<li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle"
+               data-toggle="dropdown"
+               href="#" role="button" aria-haspopup="true"
+               aria-expanded="false">Обрати іншу чергу</a>
+            <div class="dropdown-menu">
+                <form method="post" action="{% url 'main:profile' %}">
+                    {% csrf_token %}
+                    <select name="area" id="area">
+                        <option value="dar">Дарниця</option>
+                        <option value="dec">Десна</option>
+                        <option value="dni">Дніпро</option>
+                    </select>
+
+                    <select name="day" id="day">
+                        <option value="tu" selected="selected">Вівторок</option>
+                        <option value="th">Четвер</option>
+                    </select>
+
+                    <input type="submit" value="Обрати">
+                </form>
+            </div>
+        </li>
+
 <h2>Стан черги</h2>
 <table class="table table-dark">
     <thead>
     <tr>
-      <th scope="col">#</th>
+      <th scope="col">Час</th>
       <th scope="col">Стан черги</th>
       <th scope="col">Призовник</th>
     </tr>
